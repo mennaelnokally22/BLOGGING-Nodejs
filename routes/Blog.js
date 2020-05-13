@@ -7,6 +7,7 @@ const asyncRouterWrapper = require('../helpers/helper');
 const checkValidationErrors = require('../helpers/checkValidation');
 const authUser = require('../middlewares/auth');
 const checkBlogOwner = require('../middlewares/authBlogOwner');
+const uploadPhoto = require('../middlewares/photo');
 
 //Get Pages of Blogs for home page
 

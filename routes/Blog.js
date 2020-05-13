@@ -32,9 +32,25 @@ router.get(
 router.post(
   '/',
   authUser,
+  uploadPhoto,
   asyncRouterWrapper(async (req, res, next) => {
     req.body.authorId = req.user._id;
-    const blog = new Blog(req.body);
+    console.log('body', req.body);
+    console.log('file', req.file);
+
+    let { photo, tags } = req.body;
+    const { title, body } = req.body;
+
+    if (req.file) photo = `/uploads/${req.file.filename}`;
+    console.log(photo);
+    let newTags = JSON.parse(tags);
+    const blog = new Blog({
+      authorId: req.user._id,
+      title,
+      body,
+      tags: newTags,
+      photo,
+    });
     const populatedBlog = await Blog.populate(blog, {
       path: 'authorId',
       select: 'firstName lastName',

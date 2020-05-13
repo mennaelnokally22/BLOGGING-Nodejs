@@ -61,7 +61,7 @@ router.get(
     console.log(req.params.id);
     const user = await User.findById(req.params.id).populate({
       path: 'blogs',
-      select: 'title body  createdAt  tags',
+      select: 'title body createdAt tags photo',
       options: {
         sort: { createdAt: -1 },
       },

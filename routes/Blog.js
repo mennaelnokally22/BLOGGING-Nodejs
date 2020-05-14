@@ -17,12 +17,13 @@ router.get(
     const pageNum = req.params.pageNum;
     console.log('pageNum', pageNum);
     const pageSize = 4;
-    const blogs = await Blog.find({})
+    const blogsPromise = Blog.find({})
       .populate({ path: 'authorId', select: 'firstName lastName' })
       .sort({ createdAt: -1 })
       .skip((pageNum - 1) * pageSize)
       .limit(pageSize);
-    const count = await Blog.find({}).countDocuments();
+    const countPromise = Blog.countDocuments();
+    const [blogs, count] = await Promise.all([blogsPromise, countPromise]);
     const pagesCount = Math.ceil(count / pageSize);
     res.json({ blogs, pagesCount });
   })
@@ -74,6 +75,7 @@ router.patch(
     const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
       strict: 'throw',
     });
+    if (!updatedBlog) throw new CustomError('Blog Not Found!', 404);
     res.send({ message: 'Blog Updated Succ', blog: updatedBlog });
   })
 );
@@ -84,7 +86,8 @@ router.delete(
   authUser,
   checkBlogOwner,
   asyncRouterWrapper(async (req, res, next) => {
-    await Blog.findByIdAndRemove(req.params.id);
+    const deletedBlog = await Blog.findByIdAndRemove(req.params.id);
+    if (!deletedBlog) throw new CustomError('Blog Not Found!', 404);
     res.send({ message: 'Deleted Succ' });
   })
 );

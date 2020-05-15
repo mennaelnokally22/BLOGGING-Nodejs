@@ -26,7 +26,9 @@ router.post(
   checkValidationErrors,
   asyncRouterWrapper(async (req, res, next) => {
     const { email, password } = req.body;
+    console.log(email, password);
     const result = await User.findOne({ email });
+    console.log(result);
     if (result != null) {
       const user = new User(result);
       const isMatched = await user.checkPassword(password);
@@ -39,6 +41,9 @@ router.post(
         const error = new CustomError('Validation Error', 401, errors.mapped());
         next(error);
       }
+    } else {
+      const error = new CustomError('Not registered', 401);
+      next(error);
     }
   })
 );

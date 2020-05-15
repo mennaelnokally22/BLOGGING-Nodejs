@@ -59,16 +59,15 @@ router.get(
   authUser,
   asyncRouterWrapper(async (req, res, next) => {
     console.log(req.params.id);
-    const user = await User.findById(req.params.id).populate({
-      path: 'blogs',
-      select: 'title body createdAt tags photo',
-      options: {
-        sort: { createdAt: -1 },
-      },
+    const userPromise = User.findById(req.params.id);
+    const blogsPromise = Blog.find({ authorId: req.params.id }).populate({
+      path: 'authorId',
+      select: 'firstName lastName',
     });
+    const [user, blogs] = await Promise.all([userPromise, blogsPromise]);
     if (!user) throw new CustomError('User Not Found!', 404);
     res.send({
-      blogs: user.blogs,
+      blogs,
       user: { firstName: user.firstName, lastName: user.lastName },
     });
     console.log(user);
@@ -105,18 +104,12 @@ router.post(
 
 //Get followed users blogs for follower blogs page
 router.get(
-  '/followed/blogs',
+  '/followed/blogs/:pageNum',
   authUser,
   asyncRouterWrapper(async (req, res, next) => {
-    // req.user.followingUsers.map(async (ele) => {
-    //   console.log(ele);
-    //   var doc = await Blog.find({
-    //     authorId: ele,
-    //   }).populate({ path: 'authorId', select: 'firstName lastName' });
-    //   console.log(doc);
-    // });
-    // res.send({ blogs: doc.blogs });
     let doc = [];
+    const pageNum = req.params.pageNum;
+    console.log('Follower pagenum', pageNum);
     for (let i = 0; i < req.user.followingUsers.length; i++) {
       doc.push(
         await Blog.find({
@@ -126,9 +119,17 @@ router.get(
           .sort({ createdAt: -1 })
       );
     }
+    const pageSize = 4;
     const blogs = doc.flat();
-    console.log(blogs);
-    res.send({ blogs });
+    console.log('blogs len', blogs.length);
+    const pageCount = Math.ceil(blogs.length / pageSize);
+    console.log('pageCount', pageCount);
+    const slicedBlogs = blogs.slice(
+      (pageNum - 1) * pageSize,
+      pageNum * pageSize
+    );
+    console.log('Sliced', slicedBlogs);
+    res.send({ blogs: slicedBlogs, pageCount });
   })
 );
 

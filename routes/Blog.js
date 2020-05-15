@@ -99,7 +99,7 @@ router.get(
     const { title, tag } = req.query;
     console.log('title', title);
     console.log('tag', tag);
-    const tagTxt = `#${tag}`;
+    //const tagTxt = `#${tag}`;
     if (title != undefined) {
       const blogs = await Blog.find({ $text: { $search: title } }).populate({
         path: 'authorId',
@@ -108,7 +108,9 @@ router.get(
       res.send(blogs);
     } else {
       console.log('tags', tag);
-      const blogs = await Blog.find({ tags: { $in: [tagTxt] } }).populate({
+      const blogs = await Blog.find({
+        tags: { $in: [tag, tag.toLowerCase(), tag.toUpperCase()] },
+      }).populate({
         path: 'authorId',
         select: 'firstName lastName',
       });

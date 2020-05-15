@@ -60,10 +60,12 @@ router.get(
   asyncRouterWrapper(async (req, res, next) => {
     console.log(req.params.id);
     const userPromise = User.findById(req.params.id);
-    const blogsPromise = Blog.find({ authorId: req.params.id }).populate({
-      path: 'authorId',
-      select: 'firstName lastName',
-    });
+    const blogsPromise = Blog.find({ authorId: req.params.id })
+      .populate({
+        path: 'authorId',
+        select: 'firstName lastName',
+      })
+      .sort({ createdAt: -1 });
     const [user, blogs] = await Promise.all([userPromise, blogsPromise]);
     if (!user) throw new CustomError('User Not Found!', 404);
     res.send({

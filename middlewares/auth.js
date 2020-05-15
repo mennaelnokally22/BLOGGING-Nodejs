@@ -5,7 +5,6 @@ const CustomError = require('../helpers/customError');
 
 module.exports = async (req, res, next) => {
   const authorization = req.headers.authorization;
-  console.log(authorization.exp);
   if (!authorization) throw new Error('Not Authorized');
   jwt.verify(authorization, jwtSecretKey, async (err, decoded) => {
     if (err) {

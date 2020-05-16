@@ -1,6 +1,7 @@
 const express = require('express');
+const path = require('path');
 const router = express.Router();
-const User = require('../models/user');
+const User = require(path.join(__dirname, '../models/user'));
 const Blog = require('../models/Blog');
 const { check, query, validationResult } = require('express-validator');
 

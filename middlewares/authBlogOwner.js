@@ -1,4 +1,5 @@
-const User = require('../models/User');
+const path = require('path');
+const User = require(path.join(__dirname, '../models/User'));
 const Blog = require('../models/Blog');
 const CustomError = require('../helpers/customError');
 

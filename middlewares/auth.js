@@ -1,10 +1,9 @@
-const User = require('../models/user');
+const path = require('path');
+const User = require(path.join(__dirname, '../models/User'));
 const jwt = require('jsonwebtoken');
 const jwtSecretKey = process.env.JWT_SECRET;
 const CustomError = require('../helpers/customError');
 
-const path = require('path');
-//const User = require(path.join(__dirname, '../models/User'));
 module.exports = async (req, res, next) => {
   const authorization = req.headers.authorization;
   if (!authorization) throw new Error('Not Authorized');

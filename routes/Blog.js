@@ -8,6 +8,7 @@ const checkValidationErrors = require('../helpers/checkValidation');
 const authUser = require('../middlewares/auth');
 const checkBlogOwner = require('../middlewares/authBlogOwner');
 const uploadPhoto = require('../middlewares/photo');
+const cloudinary = require('../helpers/cloudinary');
 
 //Get Pages of Blogs for home page
 
@@ -42,15 +43,16 @@ router.post(
     let { photo, tags } = req.body;
     const { title, body } = req.body;
 
-    if (req.file) photo = `/uploads/${req.file.filename}`;
-    console.log(photo);
+    //if (req.file) photo = `/uploads/${req.file.filename}`;
+    if (req.file) photo = await cloudinary.v2.uploader.upload(req.file.path);
+    console.log(photo.url);
     let newTags = JSON.parse(tags);
     const blog = new Blog({
       authorId: req.user._id,
       title,
       body,
       tags: newTags,
-      photo,
+      photo: photo.url,
     });
     const populatedBlog = await Blog.populate(blog, {
       path: 'authorId',

@@ -22,4 +22,4 @@ app.use('/blog', blogRouter);
 app.use(validationErrorHandler);
 app.use(globalErrorHandler);
 
-app.listen(process.env.PORT_NUM);
+app.listen(process.env.PORT || process.env.PORT_NUM);
